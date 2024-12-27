@@ -21,15 +21,15 @@ impl TicketStoreClient {
         let (tx, rx) = sync_channel(10);
         self.sender
             .try_send(Command::Insert { draft: draft, response_channel: tx })
-            .map_err(|_| FullStoreError);
+            .map_err(|_| FullStoreError)?;
         Ok(rx.recv().unwrap())
     }
 
-    pub fn get(&self, id: TicketId) -> Result<Option<Ticket>, String> {
+    pub fn get(&self, id: TicketId) -> Result<Option<Ticket>, FullStoreError> {
         let (tx, rx) = sync_channel(10);
         self.sender
             .try_send(Command::Get { id: id, response_channel: tx })
-            .map_err(|_| FullStoreError);
+            .map_err(|_| FullStoreError)?;
         Ok(rx.recv().unwrap())
     }
 }
@@ -62,14 +62,14 @@ pub fn server(receiver: Receiver<Command>) {
                 response_channel,
             }) => {
                 let id = store.add_ticket(draft);
-                response_channel.send(id);
+                let _ = response_channel.send(id);
             }
             Ok(Command::Get {
                 id,
                 response_channel,
             }) => {
                 let ticket = store.get(id);
-                response_channel.send(ticket.cloned());
+                let _ = response_channel.send(ticket.cloned());
             }
             Err(_) => {
                 // There are no more senders, so we can safely break

@@ -7,9 +7,9 @@ use without_channels::store::TicketStore;
 
 #[test]
 fn works() {
-    let store = todo!();
+    let store = Arc::new(RwLock::new(TicketStore::new()));
 
-    let store1 = store.clone();
+    let mut store1 = store.clone();
     let client1 = spawn(move || {
         let draft = TicketDraft {
             title: ticket_title(),
@@ -18,7 +18,7 @@ fn works() {
         store1.write().unwrap().add_ticket(draft)
     });
 
-    let store2 = store.clone();
+    let mut store2 = store.clone();
     let client2 = spawn(move || {
         let draft = TicketDraft {
             title: ticket_title(),
