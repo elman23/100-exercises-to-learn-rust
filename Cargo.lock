@@ -497,6 +497,15 @@ name = "encapsulation"
 version = "0.1.0"
 
 [[package]]
+name = "encoding_rs"
+version = "0.8.35"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "75030f3c4f45dafd7586dd6780965a8c7e8e285a5ecb86713e63a79c5b2766f3"
+dependencies = [
+ "cfg-if",
+]
+
+[[package]]
 name = "enum_"
 version = "0.1.0"
 dependencies = [
@@ -1337,6 +1346,24 @@ name = "modules"
 version = "0.1.0"
 
 [[package]]
+name = "multer"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "01acbdc23469fd8fe07ab135923371d5f5a422fbf9c522158677c8eb15bc51c2"
+dependencies = [
+ "bytes",
+ "encoding_rs",
+ "futures-util",
+ "http 0.2.12",
+ "httparse",
+ "log",
+ "memchr",
+ "mime",
+ "spin",
+ "version_check",
+]
+
+[[package]]
 name = "mut_slice"
 version = "0.1.0"
 
@@ -1445,13 +1472,6 @@ name = "outro_04"
 version = "0.1.0"
 dependencies = [
  "thiserror 2.0.7",
-]
-
-[[package]]
-name = "outro_08"
-version = "0.1.0"
-dependencies = [
- "tokio",
 ]
 
 [[package]]
@@ -2048,6 +2068,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "spin"
+version = "0.9.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6980e8d7511241f8acf4aebddbb1ff938df5eebe98691418c4468d0b72a96a67"
+
+[[package]]
 name = "stack"
 version = "0.1.0"
 
@@ -2208,6 +2234,16 @@ dependencies = [
 [[package]]
 name = "threads"
 version = "0.1.0"
+
+[[package]]
+name = "ticket_api"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "tokio",
+ "warp",
+]
 
 [[package]]
 name = "ticket_fields"
@@ -2518,6 +2554,7 @@ dependencies = [
  "log",
  "mime",
  "mime_guess",
+ "multer",
  "percent-encoding",
  "pin-project",
  "scoped-tls",

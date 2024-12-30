@@ -1,7 +1,18 @@
+[[bin]]
+name = "ticket_api"
+path = "src/bin/main.rs"
+
+[lib]
+name = "ticket_api"
+path = "src/lib.rs"
+
 [package]
-name = "outro_08"
+name = "ticket_api"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 tokio = { version = "1", features = ["full"] }
+warp = "0.3"
+serde = { version = "1", features = ["derive"]}
+serde_json = "1.0"
