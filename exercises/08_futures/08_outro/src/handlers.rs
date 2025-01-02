@@ -1,53 +1,68 @@
-use models::Simulation;
-use warp::http::StatusCode;
-use std::convert::Infallible;
+use crate::models::{Ticket, TicketId};
+
 use super::models;
+use std::convert::Infallible;
+use std::sync::Arc;
+use tokio::sync::Mutex;
+use warp::http::StatusCode;
 
-pub async fn handle_list_sims(opt: Option<u64>, db: models::Db) -> Result<impl warp::Reply, Infallible> {
-    let mut result = db.lock().await.clone();
-    if let Some(param) = opt {
-        result.retain(|k| k.id == param);
+pub async fn handle_list(
+    maybe_id: Option<u64>,
+    db: Arc<Mutex<models::TicketStore>>,
+) -> Result<impl warp::Reply, Infallible> {
+    let store = db.lock().await.clone();
+    if let Some(param) = maybe_id {
+        if let Some(ticket) = store.get(models::TicketId::new(param)) {
+            Ok(warp::reply::json(&ticket))
+        } else {
+            let tickets: Vec<Ticket> = Vec::new();
+            Ok(warp::reply::json(&tickets))
+        }
+    } else {
+        let tickets = store.get_all();
+        Ok(warp::reply::json(&tickets))
     }
-    Ok(warp::reply::json(&result))
 }
 
-pub async fn handle_create_sim(sim: models::Simulation, db: models::Db) -> Result<impl warp::Reply, Infallible> {
-    let mut map = db.lock().await;
-
-    if let Some(result) = map.get(&sim) {
-        return Ok(warp::reply::with_status(
-            format!("Simulation #{} already exists under the name {}", result.id, result.name),
-            StatusCode::BAD_REQUEST
-        ));
-    }
-
-    map.insert(sim.clone());
-    Ok(warp::reply::with_status(format!("Simulation #{} created", sim.id), StatusCode::CREATED))
-}    
-
-pub async fn handle_update_sim(id: u64, name: models::Name, db: models::Db) -> Result<impl warp::Reply, Infallible> {
-    if let Some(_) = db.lock().await.replace(Simulation { id, name: name.name }) {
-        return Ok(warp::reply::with_status(
-            format!("Simulation #{} was updated.\n", id),
-            StatusCode::OK
-        ));
-    }
-    Ok(warp::reply::with_status(
-        format!("Simulation #{} was inserted.\n", id),
-        StatusCode::CREATED
-    ))
+pub async fn handle_create(
+    ticket_draft: models::TicketDraft,
+    db: Arc<Mutex<models::TicketStore>>,
+) -> Result<impl warp::Reply, Infallible> {
+    let mut store = db.lock().await;
+    let id = store.add_ticket(ticket_draft);
+    Ok(warp::reply::json(&id))
 }
 
-pub async fn handle_delete_sim(id: u64, db: models::Db) -> Result<impl warp::Reply, Infallible> {
-    if db.lock().await.remove(&Simulation{id, name: String::new(),}){
-        return Ok(warp::reply::with_status(
-            format!("Simulation #{} was deleted", id), 
-            StatusCode::OK,
-        ))
+pub async fn handle_update(
+    id: u64,
+    ticket_patch: models::TicketPatch,
+    db: Arc<Mutex<models::TicketStore>>,
+) -> Result<impl warp::Reply, Infallible> {
+    let mut store = db.lock().await;
+    let ticket = store.get_mut(TicketId::new(id));
+    if let Some(ticket) = ticket {
+        if let Some(title) = ticket_patch.title {
+            ticket.title = title;
+        }
+        if let Some(description) = ticket_patch.description {
+            ticket.description = description;
+        }
+        if let Some(status) = ticket_patch.status {
+            ticket.status = status;
+        }
+        return Ok(StatusCode::OK);
+    }
+    Ok(StatusCode::NOT_FOUND)
+}
+
+pub async fn handle_delete(
+    id: u64,
+    db: Arc<Mutex<models::TicketStore>>,
+) -> Result<impl warp::Reply, Infallible> {
+    let mut store = db.lock().await;
+    if store.del(&TicketId::new(id)) {
+        return Ok(StatusCode::OK);
     };
 
-    Ok(warp::reply::with_status(
-        format!("No data was deleted."),
-        StatusCode::OK,
-    ))
-}   
+    Ok(StatusCode::NOT_FOUND)
+}
