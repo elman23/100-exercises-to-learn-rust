@@ -10,13 +10,6 @@ pub struct TicketStore {
 }
 
 impl TicketStore {
-    pub fn new() -> Self {
-        Self {
-            tickets: BTreeMap::new(),
-            counter: 0,
-        }
-    }
-
     pub fn read_from_data() -> Self {
         let mut counter: u64 = 1;
         let mut tickets: BTreeMap<u64, Ticket> = BTreeMap::new();
