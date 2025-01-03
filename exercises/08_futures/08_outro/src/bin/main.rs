@@ -6,7 +6,7 @@ use warp::Filter;
 
 #[tokio::main]
 async fn main() {
-    let db = Arc::new(Mutex::new(db::TicketStore::new()));
+    let db = Arc::new(Mutex::new(db::TicketStore::read_from_data()));
     let routes = filters::list(db.clone())
         .or(filters::get_one(db.clone()))
         .or(filters::post(db.clone()))

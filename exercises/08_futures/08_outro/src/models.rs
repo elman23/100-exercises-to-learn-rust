@@ -1,50 +1,23 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, PartialEq, Clone, Eq, Serialize, Deserialize)]
-pub struct TicketTitle(String);
-
-impl TicketTitle {
-    pub fn new(title: String) -> Self {
-        TicketTitle(title)
-    }
-}
-
-#[derive(Debug, PartialEq, Clone, Eq, Serialize, Deserialize)]
-pub struct TicketDescription(String);
-
-impl TicketDescription {
-    pub fn new(description: String) -> Self {
-        TicketDescription(description)
-    }
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
-pub struct TicketId(u64);
-
-impl TicketId {
-    pub fn new(id: u64) -> Self {
-        TicketId(id)
-    }
-}
-
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Ticket {
-    pub id: TicketId,
-    pub title: TicketTitle,
-    pub description: TicketDescription,
+    pub id: u64,
+    pub title: String,
+    pub description: String,
     pub status: Status,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TicketDraft {
-    pub title: TicketTitle,
-    pub description: TicketDescription,
+    pub title: String,
+    pub description: String,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TicketPatch {
-    pub title: Option<TicketTitle>,
-    pub description: Option<TicketDescription>,
+    pub title: Option<String>,
+    pub description: Option<String>,
     pub status: Option<Status>,
 }
 
@@ -53,4 +26,15 @@ pub enum Status {
     ToDo,
     InProgress,
     Done,
+}
+
+impl Status {
+    pub fn parse_from_str(status: &str) -> Status {
+        match status {
+            "ToDo" => Status::ToDo,
+            "InProgress" => Status::InProgress,
+            "Done" => Status::Done,
+            _ => panic!("Invalid status!"),
+        }
+    }
 }

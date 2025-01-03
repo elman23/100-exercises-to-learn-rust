@@ -1,4 +1,4 @@
-use crate::models::{Ticket, TicketId};
+use crate::models::Ticket;
 
 use super::db;
 use super::models;
@@ -12,7 +12,7 @@ pub async fn handle_id(
     db: Arc<Mutex<db::TicketStore>>,
 ) -> Result<impl warp::Reply, Infallible> {
     let store = db.lock().await.clone();
-    if let Some(ticket) = store.get(models::TicketId::new(id)) {
+    if let Some(ticket) = store.get(id) {
         Ok(warp::reply::json(&ticket))
     } else {
         let tickets: Vec<Ticket> = Vec::new();
@@ -52,7 +52,7 @@ pub async fn handle_delete(
     db: Arc<Mutex<db::TicketStore>>,
 ) -> Result<impl warp::Reply, Infallible> {
     let mut store = db.lock().await;
-    if store.del(&TicketId::new(id)) {
+    if store.del(&id) {
         return Ok(StatusCode::OK);
     };
 
