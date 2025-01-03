@@ -26,7 +26,6 @@ impl TicketStore {
             tickets.insert(ticket.id, ticket);
             counter += 1;
         }
-        println!("Counter {}", counter);
         TicketStore { tickets, counter }
     }
 
