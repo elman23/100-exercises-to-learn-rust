@@ -18,7 +18,7 @@ impl TicketStore {
     }
 
     pub fn read_from_data() -> Self {
-        let mut counter: u64 = 0;
+        let mut counter: u64 = 1;
         let mut tickets: BTreeMap<u64, Ticket> = BTreeMap::new();
         let data: String = fs::read_to_string("./data/tickets.csv").unwrap();
         let mut reader = csv::Reader::from_reader(data.as_bytes());
@@ -33,6 +33,7 @@ impl TicketStore {
             tickets.insert(ticket.id, ticket);
             counter += 1;
         }
+        println!("Counter {}", counter);
         TicketStore { tickets, counter }
     }
 
